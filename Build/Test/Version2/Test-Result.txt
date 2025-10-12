@@ -1,0 +1,6 @@
+Test Platform: Web GL
+Result : Success
+Report : All the book translated to the new version plus Audio and videos
+bugs:
+buttons
+pwa icon
