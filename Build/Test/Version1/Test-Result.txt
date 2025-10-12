@@ -1,0 +1,3 @@
+Test Platform: Web GL
+Result : Success
+Report : The output of camera successfully shown on the screen and a cube were generated right after scanning the QRCode
