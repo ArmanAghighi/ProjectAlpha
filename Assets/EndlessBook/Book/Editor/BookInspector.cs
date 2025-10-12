@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using echo17.EndlessBook;
 
@@ -14,7 +12,6 @@ public class BookInspector : Editor
     /// Must have at least one page to turn
     /// </summary>
     protected const int MaxPagesTurningCountMin = 1;
-
     /// <summary>
     /// The width of the page name column
     /// </summary>
@@ -41,6 +38,7 @@ public class BookInspector : Editor
     /// </summary>
     protected string[] materialNames;
 
+
     void OnEnable()
     {
         // set the book
@@ -51,6 +49,7 @@ public class BookInspector : Editor
 
         // cache the material names
         materialNames = System.Enum.GetNames(typeof(EndlessBook.MaterialEnum));
+
     }
 
     /// <summary>
@@ -58,6 +57,32 @@ public class BookInspector : Editor
     /// </summary>
     public override void OnInspectorGUI()
     {
+        // EditorGUILayout.LabelField("Canvas Page of Pages", EditorStyles.boldLabel);
+        // book.rightPageCanvas = (Canvas)EditorGUILayout.ObjectField("Right Canvas", book.rightPageCanvas, typeof(Canvas), true);
+        // book.leftPageCanvas = (Canvas)EditorGUILayout.ObjectField("Left Canvas", book.leftPageCanvas, typeof(Canvas), true);
+
+
+        EditorGUILayout.LabelField("Text Direction", EditorStyles.boldLabel);
+
+        var lastTextDirection = book.textDirection;
+
+        book.textDirection = (EndlessBook.TextDirection)EditorGUILayout.EnumPopup("Direction", book.textDirection);
+
+        if (lastTextDirection != book.textDirection)
+        {
+            if (book.textDirection == EndlessBook.TextDirection.LTR)
+            {
+                book.SetState(EndlessBook.StateEnum.ClosedFront, 0, null);
+                book.SetPageNumber(1);
+            }
+            else
+            {
+                book.SetState(EndlessBook.StateEnum.ClosedBack, 0, null);
+                book.SetPageNumber(book.LastPageNumber);
+            }
+        }
+
+
         // update the current state
         var newCurrentState = (EndlessBook.StateEnum)EditorGUILayout.EnumPopup("Current State", book.CurrentState);
         if (newCurrentState != book.CurrentState)
@@ -78,7 +103,6 @@ public class BookInspector : Editor
 
         EditorGUILayout.Space();
 
-        // set the materials
         for (var i = 0; i < materialNames.Length; i++)
         {
             if (materialNames[i] != EndlessBook.BookPageRightMaterialName && materialNames[i] != EndlessBook.BookPageLeftMaterialName)
@@ -168,61 +192,75 @@ public class BookInspector : Editor
         if (showPages)
         {
             for (var i = 0; i < book.LastPageNumber; i++)
+    {
+        EditorGUILayout.BeginHorizontal();
+
+        var pageData = book.GetPageData(i + 1);
+
+        EditorGUILayout.LabelField("Page " + (i + 1).ToString(), GUILayout.Width(PageNameWidth));
+
+    
+        var newMaterial = (Material)EditorGUILayout.ObjectField(pageData.material, typeof(Material), false, GUILayout.Width(125));
+        if (newMaterial != pageData.material)
+        {
+            Undo.RecordObject(target, "Page " + (i + 1).ToString() + " changed (material)");
+            pageData.material = newMaterial;
+            book.SetPageData(i + 1, pageData);
+        }
+
+        // 🔁 Toggle per-page
+        bool newToggle = GUILayout.Toggle(pageData.hasUI, "Has UI", GUI.skin.toggle, GUILayout.Width(CalcTextWidth("Has UI")));
+        if (newToggle != pageData.hasUI)
+        {
+            Undo.RecordObject(target, "Page " + (i + 1).ToString() + " changed (hasUI)");
+            pageData.hasUI = newToggle;
+            book.SetPageData(i + 1, pageData);
+        }
+
+        if (pageData.hasUI)
+        {
+            UISO newSO = (UISO)EditorGUILayout.ObjectField(pageData.UI,typeof(UISO),false);
+
+            if (newSO != pageData.UI)
             {
-                EditorGUILayout.BeginHorizontal();
-
-                var pageData = book.GetPageData(i + 1);
-
-                EditorGUILayout.LabelField("Page " + (i + 1).ToString(), GUILayout.Width(PageNameWidth));
-
-                // set the material
-                var newMaterial = (Material)EditorGUILayout.ObjectField(pageData.material, typeof(Material), false);
-                if (newMaterial != pageData.material)
-                {
-                    Undo.RecordObject(target, "Page " + (i + 1).ToString() + " changed");
-                    book.SetPageData(i + 1, new PageData() { material = newMaterial });
-                }
-
-                EditorGUILayout.BeginHorizontal(GUILayout.Width(PageButtonWidth));
-
-                // insert a page
-                if (GUILayout.Button(new GUIContent("+", "Insert Page"), EditorStyles.miniButtonLeft))
-                {
-                    Undo.RecordObject(target, "Page " + (i + 1).ToString() + " inserted");
-                    book.InsertPageData(i + 1);
-                }
-
-                // remove this page
-                if (GUILayout.Button(new GUIContent("-", "Remove Page"), EditorStyles.miniButtonMid))
-                {
-                    Undo.RecordObject(target, "Page " + (i + 1).ToString() + " removed");
-                    book.RemovePageData(i + 1);
-                }
-
-                // move page up
-                if (i > 0)
-                {
-                    if (GUILayout.Button(new GUIContent("▲", "Move Page Up"), EditorStyles.miniButtonMid))
-                    {
-                        Undo.RecordObject(target, "Page " + (i + 1).ToString() + " moved up");
-                        book.MovePageData(i + 1, -1);
-                    }
-                }
-
-                // move page down
-                if (i < book.LastPageNumber - 1)
-                {
-                    if (GUILayout.Button(new GUIContent("▼", "Move Page Down"), EditorStyles.miniButtonRight))
-                    {
-                        Undo.RecordObject(target, "Page " + (i + 1).ToString() + " moved down");
-                        book.MovePageData(i + 1, 1);
-                    }
-                }
-
-                EditorGUILayout.EndHorizontal();
-
-                EditorGUILayout.EndHorizontal();
+                Undo.RecordObject(target, "Change UI Scriptable");
+                pageData.UI = newSO;
+                EditorUtility.SetDirty(target);
             }
+        }
+
+        // دکمه‌ها
+        EditorGUILayout.BeginHorizontal(GUILayout.Width(PageButtonWidth));
+
+        if (GUILayout.Button(new GUIContent("+", "Insert Page"), EditorStyles.miniButtonLeft))
+        {
+            Undo.RecordObject(target, "Page " + (i + 1).ToString() + " inserted");
+            book.InsertPageData(i + 1);
+        }
+
+        if (GUILayout.Button(new GUIContent("-", "Remove Page"), EditorStyles.miniButtonMid))
+        {
+            Undo.RecordObject(target, "Page " + (i + 1).ToString() + " removed");
+            book.RemovePageData(i + 1);
+            continue;
+        }
+
+        if (i > 0 && GUILayout.Button(new GUIContent("▲", "Move Page Up"), EditorStyles.miniButtonMid))
+        {
+            Undo.RecordObject(target, "Page " + (i + 1).ToString() + " moved up");
+            book.MovePageData(i + 1, -1);
+        }
+
+        if (i < book.LastPageNumber - 1 && GUILayout.Button(new GUIContent("▼", "Move Page Down"), EditorStyles.miniButtonRight))
+        {
+            Undo.RecordObject(target, "Page " + (i + 1).ToString() + " moved down");
+            book.MovePageData(i + 1, 1);
+        }
+
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.EndHorizontal();
+        EditorGUILayout.Space();
+    }
 
             EditorGUILayout.BeginHorizontal();
 
@@ -239,5 +277,10 @@ public class BookInspector : Editor
 
             EditorGUILayout.Space();
         }
+    }
+    float CalcTextWidth(string text)
+    {
+        GUIStyle style = GUI.skin.toggle;
+        return style.CalcSize(new GUIContent(text)).x + 24f; 
     }
 }
