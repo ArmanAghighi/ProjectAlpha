@@ -1,0 +1,6 @@
+Test Platform: Web GL
+Result : Success
+Report :all buttons in AR plus sandwich button worked correctly
+bugs:
+Wait Time to relocate
+page material deformation
