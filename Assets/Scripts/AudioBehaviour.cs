@@ -80,18 +80,18 @@ public class AudioBehaviour : MonoBehaviour
 
         if (audioSource.isPlaying)
         {
+            playButtonImage.sprite = pauseImage;
             audioSource.Pause();
             if (sliderCoroutine != null)
                 StopCoroutine(sliderCoroutine);
             UIGenerator.CurrentPlaying = null;
-            //playButtonImage.sprite = playImage;
         }
         else
         {
+            playButtonImage.sprite = playImage;
             audioSource.Play();
             sliderCoroutine = StartCoroutine(UpdateSliderCoroutine());
             UIGenerator.CurrentPlaying = this;
-            //playButtonImage.sprite = pauseImage;
         }
     }
 
@@ -112,12 +112,21 @@ public class AudioBehaviour : MonoBehaviour
         audioSource.Stop();
         slider.value = 0;
         timerPlaceholder.text = "00:00";
-        //playButtonImage.sprite = playImage;
     }
 
     public void OnSliderChanged()
     {
         if (audioSource != null)
             audioSource.time = slider.value;
+    }
+     
+    public void SetTransparency(Image obj, float alpha)
+    {
+        if(obj != null)
+        {
+            Color color = obj.color;
+            color.a = Mathf.Clamp01(alpha); // محدود کردن بین 0 و 1
+            obj.color = color;
+        }
     }
 }

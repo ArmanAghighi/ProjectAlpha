@@ -917,6 +917,7 @@ GameObject:
   m_Component:
   - component: {fileID: 810950899}
   - component: {fileID: 810950898}
+  - component: {fileID: 810950900}
   m_Layer: 0
   m_Name: Image AR Session
   m_TagString: Untagged
@@ -969,6 +970,14 @@ Transform:
   - {fileID: 912982874}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!81 &810950900
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 810950897}
+  m_Enabled: 1
 --- !u!1 &907202480
 GameObject:
   m_ObjectHideFlags: 0
