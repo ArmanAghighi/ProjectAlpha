@@ -19,7 +19,7 @@ namespace WebARFoundation
         public int maxTrack = 1;
         public TextMeshProUGUI debug;
         public Action OnARActivated;
-        public Button reset;
+        public TMP_Dropdown reset;
         
         [Range(1, 6)] public int stability = 4;
 
@@ -32,7 +32,7 @@ namespace WebARFoundation
         [SerializeField] private Camera contentCamera;
         [SerializeField] private bool billboardToCamera = false;
         [SerializeField] private Quaternion rotationOffset;
-        [SerializeField] private float stableDelay = 0.2f;
+        [SerializeField] private float stableDelay = 0.02f;
 
         public void SetLogs(TextMeshProUGUI placeholder, string text) => placeholder.text = text;
 
@@ -118,7 +118,6 @@ namespace WebARFoundation
             var tracker = imageTrackers.Find(t => t.targetIndex == targetIndex);
             if (tracker != null)
             {
-                reset.onClick.RemoveAllListeners();
                 if (isFound == 1)
                 {
                     OnTargetFound?.Invoke(targetIndex);
@@ -136,11 +135,15 @@ namespace WebARFoundation
                         if (!reset.interactable) reset.interactable = true;
                         OnTargetLost?.Invoke();
                     }
-                    reset.onClick.AddListener(() =>
+                    reset.onValueChanged.AddListener(OnDropdownChanged);
+                    void OnDropdownChanged(int index)
                     {
-                        if (alreadyFound) alreadyFound = false;
-                        if (tracker.gameObject.activeInHierarchy) tracker.gameObject.SetActive(false);
-                    });
+                        if (index == 2)
+                        {
+                            if (alreadyFound) alreadyFound = false;
+                            if (tracker.gameObject.activeInHierarchy) tracker.gameObject.SetActive(false);
+                        }
+                    }
                 }
                 SetLogs(debug, $"isFound : {isFound} , alreadyFound : {alreadyFound}");
             }
@@ -209,7 +212,7 @@ namespace WebARFoundation
                 if (sca != null) sca.SetText("Scale: {0:F2}, {1:F2}, {2:F2}", t.localScale.x, t.localScale.y, t.localScale.z);
             }
         }
-        
+
         public ImageTracker GetImageTrackerByIndex(int index)
         {
             if (imageTrackers == null) return null;

@@ -7,6 +7,7 @@ public class AudioBehaviour : MonoBehaviour
 {
     [Header("UI References")]
     [SerializeField] private Image playButtonImage;
+    [SerializeField] private Sprite stopImage;
     [SerializeField] private Sprite playImage;
     [SerializeField] private Sprite pauseImage;
     [SerializeField] private Slider slider;
@@ -80,7 +81,7 @@ public class AudioBehaviour : MonoBehaviour
 
         if (audioSource.isPlaying)
         {
-            playButtonImage.sprite = pauseImage;
+            playButtonImage.sprite = playImage;
             audioSource.Pause();
             if (sliderCoroutine != null)
                 StopCoroutine(sliderCoroutine);
@@ -88,7 +89,7 @@ public class AudioBehaviour : MonoBehaviour
         }
         else
         {
-            playButtonImage.sprite = playImage;
+            playButtonImage.sprite = pauseImage;
             audioSource.Play();
             sliderCoroutine = StartCoroutine(UpdateSliderCoroutine());
             UIGenerator.CurrentPlaying = this;
@@ -108,6 +109,7 @@ public class AudioBehaviour : MonoBehaviour
 
     public void ResetAudio()
     {
+        playButtonImage.sprite = stopImage;
         if (audioSource == null) return;
         audioSource.Stop();
         slider.value = 0;

@@ -793,7 +793,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -2131036683, guid: 6029136d76cc31941ac5bf86f276456b, type: 3}
+  m_Sprite: {fileID: -1722564933, guid: 6029136d76cc31941ac5bf86f276456b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -899,6 +899,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playButtonImage: {fileID: 333761034295667890}
+  stopImage: {fileID: -1722564933, guid: 6029136d76cc31941ac5bf86f276456b, type: 3}
   playImage: {fileID: -1124655603, guid: 6029136d76cc31941ac5bf86f276456b, type: 3}
   pauseImage: {fileID: -2131036683, guid: 6029136d76cc31941ac5bf86f276456b, type: 3}
   slider: {fileID: 3094867077728058328}
