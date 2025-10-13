@@ -83,7 +83,7 @@ namespace WebARFoundation
             {
                 if (contentCamera != null)
                 {
-                    Vector3 centerPos = contentCamera.transform.position + contentCamera.transform.forward * 1600f;
+                    Vector3 centerPos = contentCamera.transform.position + contentCamera.transform.forward * 1900f;
 
                     smoothedPos = Vector3.Lerp(smoothedPos, centerPos, 1f - Mathf.Exp(-positionSmoothSpeed * Time.deltaTime));
                     

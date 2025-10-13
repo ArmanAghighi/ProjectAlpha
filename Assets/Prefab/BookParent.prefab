@@ -1047,8 +1047,8 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 13d8a7cc0299e7044b3f718384d32c04, type: 2}
   - {fileID: 2100000, guid: f4c4998190025e74c9bdb4959ac0e559, type: 2}
-  - {fileID: 2100000, guid: 6edd5709601327f49ace91f13d548063, type: 2}
-  - {fileID: 2100000, guid: 23532ea3e0fb40246b323e7a13b8eaca, type: 2}
+  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
+  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
   - {fileID: 2100000, guid: bdb38526121b86447b50668e29efe201, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -1161,7 +1161,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1740763321241856083}
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: -0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0.0037}
+  m_LocalPosition: {x: 0, y: 0, z: 0.004}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -1169,7 +1169,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0.0005, y: 0.06}
+  m_AnchoredPosition: {x: -0.0005, y: 0.08}
   m_SizeDelta: {x: 0.724, y: 0.3682}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &6000853081365438174
@@ -2870,9 +2870,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5634167545346587807}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 2.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7131081087506540345}
@@ -2881,7 +2881,7 @@ Transform:
   - {fileID: 4082414221699346975}
   - {fileID: 3961243093093338695}
   m_Father: {fileID: 1387141612695987349}
-  m_LocalEulerAnglesHint: {x: 270, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4369807152555074681
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2911,8 +2911,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 13d8a7cc0299e7044b3f718384d32c04, type: 2}
   - {fileID: 2100000, guid: f4c4998190025e74c9bdb4959ac0e559, type: 2}
   - {fileID: 2100000, guid: bdb38526121b86447b50668e29efe201, type: 2}
-  - {fileID: 2100000, guid: 23532ea3e0fb40246b323e7a13b8eaca, type: 2}
-  - {fileID: 2100000, guid: 6edd5709601327f49ace91f13d548063, type: 2}
+  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
+  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
   materialMappings:
   - materialType: 0
     mappings:
@@ -2997,7 +2997,7 @@ MonoBehaviour:
   pages:
   - {fileID: 4694476860178926286}
   - {fileID: 26028377328555346}
-  currentPageNumber: 0
+  currentPageNumber: 1
   maxPagesTurningCount: 1
   deltaTime: 0
   pageFillerMaterial: {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}

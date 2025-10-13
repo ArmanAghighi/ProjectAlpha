@@ -3,6 +3,7 @@ using UnityEngine;
 using echo17.EndlessBook;
 using System.Collections;
 using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class PageHandler : MonoBehaviour
 {
@@ -45,7 +46,22 @@ public class PageHandler : MonoBehaviour
             Debug.Log("UI cleare start");
         }
     }
+bool IsPointerOverUI()
+{
+    PointerEventData eventData = new PointerEventData(EventSystem.current);
+    eventData.position = Input.mousePosition;
 
+    List<RaycastResult> results = new List<RaycastResult>();
+    EventSystem.current.RaycastAll(eventData, results);
+
+    foreach (var r in results)
+    {
+        if (r.gameObject.CompareTag("UI")) // هر چیزی که نباید ورق بزنه
+            return true;
+    }
+
+    return false;
+}
     void HandleTouch(Touch touch)
     {
         if (InteractiveManagment.CurrentState == InteractionState.OnZoom)
@@ -87,6 +103,8 @@ public class PageHandler : MonoBehaviour
 
     void HandleTouchDown(Vector2 screenPos)
     {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject() || IsPointerOverUI())
+            return;
         if (Book.IsTurningPages || Book.IsDraggingPage) return;
 
         Ray ray = SceneCamera.ScreenPointToRay(screenPos);
