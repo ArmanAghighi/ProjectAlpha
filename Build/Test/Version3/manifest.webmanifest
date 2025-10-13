@@ -1,0 +1,15 @@
+{
+    "name": "Tose'e AR",
+    "short_name": "Tose'e AR",
+    "start_url": "index.html",
+    "display": "fullscreen",
+    "background_color": "#FFFFFF",
+    "theme_color": "#000",
+    "description": "An AR based web application developed for Tose'e Saderat Bank of Iran",
+    "icons": [{
+      "src": "TemplateData/icons/unity-logo-dark.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }]
+  }

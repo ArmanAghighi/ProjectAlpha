@@ -1,0 +1,5 @@
+Test Platform: Web GL
+Result : Success
+Report : PWA full screen done , PWA icon changed plus some preview changes
+bugs:
+buttons
