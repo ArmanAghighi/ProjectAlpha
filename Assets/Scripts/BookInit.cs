@@ -6,6 +6,8 @@ using System.Collections;
 using echo17.EndlessBook;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using UnityEngine.Video;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(EndlessBook))]
 public class BookInit : MonoBehaviour
@@ -28,6 +30,14 @@ public class BookInit : MonoBehaviour
     [SerializeField] private TextMeshProUGUI debug;
     [Header("Events")]
     public UnityEvent OnReady;
+    [Header("Video")]
+    [SerializeField] private RenderTexture videoRenderer;
+    [SerializeField] private Button leftPlayButton;
+    [SerializeField] private Button rightPlayButton;
+    private List<VideoPlayer> vidoeList = new List<VideoPlayer>();
+    private bool isPlaying;
+
+
     private EndlessBook book;
     private bool isLTR;
     private Dictionary<int, UISO> uiScriptableObject = new Dictionary<int, UISO>();
@@ -57,7 +67,7 @@ public class BookInit : MonoBehaviour
         videoAddress = CombineUrl(mainAddress, "Content", videoAddress);
 
         book.SetMaxPagesTurningCount(initialMaxPagesTurning);
-
+        
         StartCoroutine(GetAccessToServer());
     }
 
@@ -110,6 +120,7 @@ public class BookInit : MonoBehaviour
                 yield break;
             }
 
+            Vector2 textureScale = new Vector2(1.245f, 1f);
             foreach (var asset in assetList.Assets)
             {
                 if (asset.PageIndex < 1)
@@ -125,8 +136,10 @@ public class BookInit : MonoBehaviour
                 }
 
                 // ایجاد Material
+
                 Shader sh = Shader.Find("Universal Render Pipeline/Simple Lit") ?? Shader.Find("Standard");
                 Material mat = new Material(sh) { name = $"Page_{asset.PageIndex}" };
+                mat.mainTextureScale = textureScale;
                 if (mat.HasProperty("_BaseMap") && tex != null)
                     mat.SetTexture("_BaseMap", tex);
 
@@ -156,7 +169,6 @@ public class BookInit : MonoBehaviour
 
                         pageUI.audioInfos.Add(audioSO);
 
-                        // شروع دانلود با callback که pageIndex و audioIndex دارد
                         int capturedPageIndex = asset.PageIndex;
                         int capturedAudioIndex = i;
 
@@ -167,7 +179,28 @@ public class BookInit : MonoBehaviour
 
                         StartCoroutine(DownloadAudio(audioAsset.Path, audioSO));
                     }
-
+                }
+                else if (pageUI.HasUI && asset.video != null)
+                {
+                    var VideoAsset = asset.video;
+                    VideoSO videoSO = ScriptableObject.CreateInstance<VideoSO>();
+                    videoSO.URL = VideoAsset.URL;
+                    pageUI.video = videoSO;
+                    RenderTexture newVideoRenderer = new RenderTexture(videoRenderer);
+                    mat.SetTexture("_BaseMap", newVideoRenderer);
+                    VideoPlayer videoPlayer = gameObject.AddComponent<VideoPlayer>();
+                    videoPlayer.targetTexture = newVideoRenderer;
+                    videoPlayer.url = VideoAsset.URL;
+                    videoPlayer.Pause();
+                    vidoeList.Add(videoPlayer);
+                    if (book.GetPageData(book.CurrentPageNumber).hasUI && book.CurrentPageNumber % 2 == 0)
+                    {
+                        leftPlayButton.GetComponent<Image>().enabled = true;
+                    }
+                    if (book.GetPageData(book.CurrentPageNumber).hasUI && book.CurrentPageNumber % 2 != 0)
+                    {
+                        rightPlayButton.GetComponent<Image>().enabled = true;
+                    }
                 }
                 UISO[asset.PageIndex] = pageUI;
 
@@ -177,6 +210,15 @@ public class BookInit : MonoBehaviour
                 PageData pd = new PageData { material = mat, hasUI = asset.HasUI, UI = pageUI };
                 book.SetPageData(asset.PageIndex, pd);
             }
+        leftPlayButton.onClick.AddListener(() =>
+        {
+            ShowAndHidePlayButton(leftPlayButton, 2f);
+            
+        });
+        rightPlayButton.onClick.AddListener(() =>
+        {
+            ShowAndHidePlayButton(rightPlayButton, 2f);
+        });
         OnDownloadedFinishEvent();
         }
     }
@@ -253,6 +295,15 @@ public class BookInit : MonoBehaviour
                 Debug.LogError("Audio download failed: " + request.error);
         }
     }
+    private IEnumerator ShowAndHidePlayButton(Button button, float duration)
+    {
+        isPlaying = !isPlaying;
+        if (button == null) yield break;
+        button.gameObject.GetComponent<Image>().enabled = true;
+        yield return new WaitForSeconds(duration);
+        button.gameObject.GetComponent<Image>().enabled = false;
+
+    }
 }
 
 
@@ -278,6 +329,12 @@ public class AudioAsset
 }
 
 [Serializable]
+public class VideoAsset
+{
+    public string URL;
+}
+
+[Serializable]
 public class AssetData
 {
     public string Name;
@@ -286,6 +343,7 @@ public class AssetData
     public int PageIndex;
     public bool HasUI;
     public List<AudioAsset> Audios;
+    public VideoAsset video;
 }
 
 [Serializable]
