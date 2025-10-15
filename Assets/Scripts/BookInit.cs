@@ -110,6 +110,7 @@ public class BookInit : MonoBehaviour
                 yield break;
             }
 
+            Vector2 textureScale = new Vector2(1.245f, 1f);
             foreach (var asset in assetList.Assets)
             {
                 if (asset.PageIndex < 1)
@@ -125,8 +126,10 @@ public class BookInit : MonoBehaviour
                 }
 
                 // ایجاد Material
+                
                 Shader sh = Shader.Find("Universal Render Pipeline/Simple Lit") ?? Shader.Find("Standard");
                 Material mat = new Material(sh) { name = $"Page_{asset.PageIndex}" };
+                mat.mainTextureScale = textureScale;
                 if (mat.HasProperty("_BaseMap") && tex != null)
                     mat.SetTexture("_BaseMap", tex);
 
