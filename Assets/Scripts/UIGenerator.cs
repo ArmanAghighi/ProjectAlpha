@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Video;
 
 public enum UI
 {
@@ -12,6 +13,7 @@ public class UIGenerator : MonoBehaviour
 
     [SerializeField] private Canvas canvasParent;
     [SerializeField] private GameObject audioPanelPrefab;
+
 
     public static AudioBehaviour CurrentPlaying { get; set; }
 
