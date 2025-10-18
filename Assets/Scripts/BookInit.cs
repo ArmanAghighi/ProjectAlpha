@@ -32,11 +32,12 @@ public class BookInit : MonoBehaviour
     public UnityEvent OnReady;
     [Header("Video")]
     [SerializeField] private RenderTexture videoRenderer;
-    [SerializeField] private Button leftPlayButton;
-    [SerializeField] private Button rightPlayButton;
+    public Button leftPlayButton;
+    public Button rightPlayButton;
     private List<VideoPlayer> vidoeList = new List<VideoPlayer>();
     private bool isPlaying;
-
+    private VideoPlayer[] vPlayers;
+    public VideoPlayer[] GetVPlayers() => vPlayers;
 
     private EndlessBook book;
     private bool isLTR;
@@ -191,15 +192,16 @@ public class BookInit : MonoBehaviour
                     VideoPlayer videoPlayer = gameObject.AddComponent<VideoPlayer>();
                     videoPlayer.targetTexture = newVideoRenderer;
                     videoPlayer.url = VideoAsset.URL;
+                    videoPlayer.playOnAwake = false;
                     videoPlayer.Pause();
                     vidoeList.Add(videoPlayer);
-                    if (book.GetPageData(book.CurrentPageNumber).hasUI && book.CurrentPageNumber % 2 == 0)
+                    if (book.GetPageData(book.CurrentLeftPageNumber).UI.video != null)
                     {
-                        leftPlayButton.GetComponent<Image>().enabled = true;
+                        leftPlayButton.gameObject.SetActive(true);
                     }
-                    if (book.GetPageData(book.CurrentPageNumber).hasUI && book.CurrentPageNumber % 2 != 0)
+                    if (book.GetPageData(book.CurrentRightPageNumber).UI.video != null)
                     {
-                        rightPlayButton.GetComponent<Image>().enabled = true;
+                        rightPlayButton.gameObject.SetActive(true);
                     }
                 }
                 UISO[asset.PageIndex] = pageUI;
@@ -210,15 +212,52 @@ public class BookInit : MonoBehaviour
                 PageData pd = new PageData { material = mat, hasUI = asset.HasUI, UI = pageUI };
                 book.SetPageData(asset.PageIndex, pd);
             }
-        leftPlayButton.onClick.AddListener(() =>
-        {
-            ShowAndHidePlayButton(leftPlayButton, 2f);
-            
-        });
-        rightPlayButton.onClick.AddListener(() =>
-        {
-            ShowAndHidePlayButton(rightPlayButton, 2f);
-        });
+            leftPlayButton.onClick.AddListener(() =>
+            {
+                int currentPage = book.CurrentLeftPageNumber;
+                var players = gameObject.GetComponents<VideoPlayer>();
+
+                foreach (var p in players)
+                {
+                    if (UISO[currentPage].video != null && p.url == UISO[currentPage].video.URL)
+                    {
+                        if (p.isPlaying)
+                        {
+                            p.Pause();
+                            leftPlayButton.gameObject.GetComponent<Image>().enabled = true;
+                        }
+                        else
+                        {
+                            p.Play();
+                            StartCoroutine(ShowAndHidePlayButton(leftPlayButton, 2f));
+                        }
+                        break;
+                    }
+                }
+            });
+            rightPlayButton.onClick.AddListener(() =>
+            {
+                int currentPage = book.CurrentRightPageNumber;
+                var players = gameObject.GetComponents<VideoPlayer>();
+
+                foreach (var p in players)
+                {
+                    if (UISO[currentPage].video != null && p.url == UISO[currentPage].video.URL)
+                    {
+                        if (p.isPlaying)
+                        {
+                            p.Pause();
+                            rightPlayButton.gameObject.GetComponent<Image>().enabled = true;
+                        }
+                        else
+                        {
+                            p.Play();
+                            StartCoroutine(ShowAndHidePlayButton(rightPlayButton, 2f));
+                        }
+                        break;
+                    }
+                }
+            });
         OnDownloadedFinishEvent();
         }
     }
@@ -277,6 +316,7 @@ public class BookInit : MonoBehaviour
             book.SetPageNumber(1);
             book.SetState(EndlessBook.StateEnum.ClosedFront, 0f);
         }
+        vPlayers = gameObject.GetComponents<VideoPlayer>();
         Debug.Log("Book is Ready!");
     }
 
@@ -299,6 +339,7 @@ public class BookInit : MonoBehaviour
     {
         isPlaying = !isPlaying;
         if (button == null) yield break;
+        button.gameObject.GetComponent<Button>().enabled = true;
         button.gameObject.GetComponent<Image>().enabled = true;
         yield return new WaitForSeconds(duration);
         button.gameObject.GetComponent<Image>().enabled = false;
