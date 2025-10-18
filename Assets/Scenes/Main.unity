@@ -2181,6 +2181,18 @@ PrefabInstance:
       propertyPath: m_Interactable
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3992256979275662815, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: PlaySprite
+      value: 
+      objectReference: {fileID: 1368709936, guid: 8259ffb64c00343498eb14fc8cf25a9d, type: 3}
+    - target: {fileID: 3992256979275662815, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: PauseSprite
+      value: 
+      objectReference: {fileID: -773033819, guid: 8259ffb64c00343498eb14fc8cf25a9d, type: 3}
+    - target: {fileID: 5249890009769300894, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -773033819, guid: 8259ffb64c00343498eb14fc8cf25a9d, type: 3}
     - target: {fileID: 5249890009769300894, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
       propertyPath: m_Color.a
       value: 0.50980395
@@ -2213,6 +2225,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 0.15
       objectReference: {fileID: 0}
+    - target: {fileID: 7539037319850878040, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -773033819, guid: 8259ffb64c00343498eb14fc8cf25a9d, type: 3}
     - target: {fileID: 7539037319850878040, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
       propertyPath: m_Color.a
       value: 0.50980395
