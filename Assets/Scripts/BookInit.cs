@@ -34,6 +34,8 @@ public class BookInit : MonoBehaviour
     [SerializeField] private RenderTexture videoRenderer;
     public Button leftPlayButton;
     public Button rightPlayButton;
+    public Sprite PauseSprite;
+    public Sprite PlaySprite;
     private List<VideoPlayer> vidoeList = new List<VideoPlayer>();
     private bool isPlaying;
     private VideoPlayer[] vPlayers;
@@ -225,10 +227,12 @@ public class BookInit : MonoBehaviour
                         {
                             p.Pause();
                             leftPlayButton.gameObject.GetComponent<Image>().enabled = true;
+                            leftPlayButton.gameObject.GetComponent<Image>().sprite = PauseSprite;
                         }
                         else
                         {
                             p.Play();
+                            leftPlayButton.gameObject.GetComponent<Image>().sprite = PlaySprite;
                             StartCoroutine(ShowAndHidePlayButton(leftPlayButton, 2f));
                         }
                         break;
@@ -248,11 +252,13 @@ public class BookInit : MonoBehaviour
                         {
                             p.Pause();
                             rightPlayButton.gameObject.GetComponent<Image>().enabled = true;
+                            rightPlayButton.gameObject.GetComponent<Image>().sprite = PauseSprite;
                         }
                         else
                         {
                             p.Play();
                             StartCoroutine(ShowAndHidePlayButton(rightPlayButton, 2f));
+                            rightPlayButton.gameObject.GetComponent<Image>().sprite = PlaySprite;
                         }
                         break;
                     }
