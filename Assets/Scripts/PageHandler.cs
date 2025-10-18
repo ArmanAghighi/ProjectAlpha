@@ -4,6 +4,7 @@ using echo17.EndlessBook;
 using System.Collections;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class PageHandler : MonoBehaviour
 {
@@ -17,9 +18,12 @@ public class PageHandler : MonoBehaviour
 
     public static bool IsTouching = false;
     protected BoxCollider boxCollider;
+    private BookInit bookinit;
+
     void Awake()
     {
         boxCollider = GetComponent<BoxCollider>();
+        bookinit = Book.gameObject.GetComponent<BookInit>();
         if (SceneCamera == null)
             SceneCamera = Camera.main;
         Book.stateChanged += OnBookStateChanged;
@@ -106,7 +110,7 @@ bool IsPointerOverUI()
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject() || IsPointerOverUI())
             return;
         if (Book.IsTurningPages || Book.IsDraggingPage) return;
-
+        
         Ray ray = SceneCamera.ScreenPointToRay(screenPos);
         if (!Physics.Raycast(ray, out RaycastHit hit)) return;
 
@@ -114,6 +118,13 @@ bool IsPointerOverUI()
         var direction = normalizedTime > 0.5f ? Page.TurnDirectionEnum.TurnForward : Page.TurnDirectionEnum.TurnBackward;
 
         if (Book.isChangingState) return;
+
+        bookinit.leftPlayButton.gameObject.SetActive(false);
+        bookinit.rightPlayButton.gameObject.SetActive(false);
+        foreach (var vp in bookinit.GetVPlayers())
+            vp.Pause();
+
+
 
         switch (Book.CurrentState)
         {
@@ -249,6 +260,15 @@ bool IsPointerOverUI()
             pageUI.audioInfos[i].Position,
             pageSide);
 
+        }
+                
+        if (Book.GetPageData(Book.CurrentLeftPageNumber).UI.video != null)
+        {
+            bookinit.leftPlayButton.gameObject.SetActive(true);
+        }
+        if (Book.GetPageData(Book.CurrentRightPageNumber).UI.video != null)
+        {
+            bookinit.rightPlayButton.gameObject.SetActive(true);
         }
     }
 }
