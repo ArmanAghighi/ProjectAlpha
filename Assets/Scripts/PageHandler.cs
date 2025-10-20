@@ -253,20 +253,20 @@ bool IsPointerOverUI()
 
         UISO pageUI = Book.GetPageData(pageNumber).UI;
 
-        for (int i = 0; i < pageUI.audioInfos.Count; i++)
+        for (int i = 0; i < pageUI.AudioInfo.Count; i++)
         {
             UIGenerator.Instance.Generator(UI.Audio,
             pageUI,
-            pageUI.audioInfos[i].Position,
+            pageUI.AudioInfo[i].Position,
             pageSide);
 
         }
                 
-        if (Book.GetPageData(Book.CurrentLeftPageNumber).UI.video != null)
+        if (Book.GetPageData(Book.CurrentLeftPageNumber).UI.VideoInfo != null)
         {
             bookinit.leftPlayButton.gameObject.SetActive(true);
         }
-        if (Book.GetPageData(Book.CurrentRightPageNumber).UI.video != null)
+        if (Book.GetPageData(Book.CurrentRightPageNumber).UI.VideoInfo != null)
         {
             bookinit.rightPlayButton.gameObject.SetActive(true);
         }

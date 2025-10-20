@@ -155,56 +155,59 @@ public class BookInit : MonoBehaviour
                 pageUI.PageIndex = asset.PageIndex;
                 pageUI.HasUI = asset.HasUI;
 
-                // اضافه کردن AudioSO ها
-                if (pageUI.HasUI && asset.Audios != null && asset.Audios.Count > 0)
+                if(pageUI.HasUI)
                 {
-                    for (int i = 0; i < asset.Audios.Count; i++)
+                    // اضافه کردن AudioSO ها
+                    if (asset.Audios != null && asset.Audios.Count > 0)
                     {
-                        var audioAsset = asset.Audios[i];
-                        AudioSO audioSO = ScriptableObject.CreateInstance<AudioSO>();
-                        audioSO.AudioIndex = audioAsset.AudioIndex;
-                        audioSO.Position = audioAsset.GetMediaPosition();
-                        audioSO.Width = audioAsset.Width;
-                        audioSO.Height = audioAsset.Height;
-                        audioSO.PlayOnAwake = audioAsset.PlayOnAwake;
-                        audioSO.Mute = audioAsset.Mute;
-                        audioSO.Volume = audioAsset.Volume;
-
-                        pageUI.audioInfos.Add(audioSO);
-
-                        int capturedPageIndex = asset.PageIndex;
-                        int capturedAudioIndex = i;
-
-                        audioSO.OnClipReady += (so) =>
+                        for (int i = 0; i < asset.Audios.Count; i++)
                         {
-                            OnAudioClipReady(so, capturedPageIndex, capturedAudioIndex);
-                        };
+                            var audioAsset = asset.Audios[i];
+                            AudioSO audioSO = ScriptableObject.CreateInstance<AudioSO>();
+                            audioSO.AudioIndex = audioAsset.AudioIndex;
+                            audioSO.Position = audioAsset.GetMediaPosition();
+                            audioSO.Width = audioAsset.Width;
+                            audioSO.Height = audioAsset.Height;
+                            audioSO.PlayOnAwake = audioAsset.PlayOnAwake;
+                            audioSO.Mute = audioAsset.Mute;
+                            audioSO.Volume = audioAsset.Volume;
 
-                        StartCoroutine(DownloadAudio(audioAsset.Path, audioSO));
+                            pageUI.AudioInfo.Add(audioSO);
+
+                            int capturedPageIndex = asset.PageIndex;
+                            int capturedAudioIndex = i;
+
+                            audioSO.OnClipReady += (so) =>
+                            {
+                                OnAudioClipReady(so, capturedPageIndex, capturedAudioIndex);
+                            };
+
+                            StartCoroutine(DownloadAudio(audioAsset.Path, audioSO));
+                        }
                     }
-                }
-                else if (pageUI.HasUI && asset.video != null)
-                {
-                    var VideoAsset = asset.video;
-                    VideoSO videoSO = ScriptableObject.CreateInstance<VideoSO>();
-                    videoSO.URL = VideoAsset.URL;
-                    pageUI.video = videoSO;
-                    RenderTexture newVideoRenderer = new RenderTexture(videoRenderer);
-                    mat.SetTexture("_BaseMap", newVideoRenderer);
-                    VideoPlayer videoPlayer = gameObject.AddComponent<VideoPlayer>();
-                    videoPlayer.targetTexture = newVideoRenderer;
-                    videoPlayer.url = VideoAsset.URL;
-                    videoPlayer.playOnAwake = false;
-                    videoPlayer.Pause();
-                    vidoeList.Add(videoPlayer);
-                    if (book.GetPageData(book.CurrentLeftPageNumber).UI.video != null)
+                    else if (asset.Videos != null)
                     {
-                        leftPlayButton.gameObject.SetActive(true);
-                    }
-                    if (book.GetPageData(book.CurrentRightPageNumber).UI.video != null)
-                    {
-                        rightPlayButton.gameObject.SetActive(true);
-                    }
+                        Debug.Log(asset.Videos.Path);
+                        VideoSO videoSO = ScriptableObject.CreateInstance<VideoSO>();
+                        videoSO.URL = asset.Videos.Path;
+                        pageUI.VideoInfo = videoSO;
+                        RenderTexture newVideoRenderer = new RenderTexture(videoRenderer);
+                        mat.SetTexture("_BaseMap", newVideoRenderer);
+                        VideoPlayer videoPlayer = gameObject.AddComponent<VideoPlayer>();
+                        videoPlayer.targetTexture = newVideoRenderer;
+                        videoPlayer.url = videoSO.URL;
+                        videoPlayer.playOnAwake = false;
+                        videoPlayer.Pause();
+                        vidoeList.Add(videoPlayer);
+                        if (book.GetPageData(book.CurrentLeftPageNumber).UI.VideoInfo != null)
+                        {
+                            leftPlayButton.gameObject.SetActive(true);
+                        }
+                        if (book.GetPageData(book.CurrentRightPageNumber).UI.VideoInfo != null)
+                        {
+                            rightPlayButton.gameObject.SetActive(true);
+                        }
+                    }                    
                 }
                 UISO[asset.PageIndex] = pageUI;
 
@@ -221,7 +224,7 @@ public class BookInit : MonoBehaviour
 
                 foreach (var p in players)
                 {
-                    if (UISO[currentPage].video != null && p.url == UISO[currentPage].video.URL)
+                    if (UISO[currentPage].VideoInfo != null && p.url == UISO[currentPage].VideoInfo.URL)
                     {
                         if (p.isPlaying)
                         {
@@ -246,7 +249,7 @@ public class BookInit : MonoBehaviour
 
                 foreach (var p in players)
                 {
-                    if (UISO[currentPage].video != null && p.url == UISO[currentPage].video.URL)
+                    if (UISO[currentPage].VideoInfo != null && p.url == UISO[currentPage].VideoInfo.URL)
                     {
                         if (p.isPlaying)
                         {
@@ -271,9 +274,9 @@ public class BookInit : MonoBehaviour
     private void OnAudioClipReady(AudioSO so, int pageIndex, int audioIndex)
     {
 
-        if (UISO.TryGetValue(pageIndex, out UISO uiso) && audioIndex < uiso.audioInfos.Count)
+        if (UISO.TryGetValue(pageIndex, out UISO uiso) && audioIndex < uiso.AudioInfo.Count)
         {
-            uiso.audioInfos[audioIndex] = so;
+            uiso.AudioInfo[audioIndex] = so;
 
             // اطلاع به AudioBehaviour ها
             SetPageIndex?.Invoke(pageIndex, audioIndex);
@@ -378,7 +381,7 @@ public class AudioAsset
 [Serializable]
 public class VideoAsset
 {
-    public string URL;
+    public string Path;
 }
 
 [Serializable]
@@ -390,7 +393,7 @@ public class AssetData
     public int PageIndex;
     public bool HasUI;
     public List<AudioAsset> Audios;
-    public VideoAsset video;
+    public VideoAsset Videos;
 }
 
 [Serializable]

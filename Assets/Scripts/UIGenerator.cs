@@ -33,7 +33,7 @@ public class UIGenerator : MonoBehaviour
         switch (type)
         {
             case UI.Audio:
-                foreach (var audioSO in ui.audioInfos)
+                foreach (var audioSO in ui.AudioInfo)
                     GenerateAudioUI(audioSO, offsetPosition, isOnRightPage);
                 break;
 

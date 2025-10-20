@@ -24,6 +24,6 @@ public class UISO : ScriptableObject
     public string Type;
     public int PageIndex;
     public bool HasUI;
-    public List<AudioSO> audioInfos = new List<AudioSO>();
-    public VideoSO video;
+    public List<AudioSO> AudioInfo = new List<AudioSO>();
+    public VideoSO VideoInfo;
 }
