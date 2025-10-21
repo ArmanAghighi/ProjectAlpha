@@ -40,6 +40,8 @@ public class BookInit : MonoBehaviour
     private bool isPlaying;
     private VideoPlayer[] vPlayers;
     public VideoPlayer[] GetVPlayers() => vPlayers;
+    [Header("PDF")]
+    public Texture PDFTexture;
 
     private EndlessBook book;
     private bool isLTR;
@@ -155,7 +157,7 @@ public class BookInit : MonoBehaviour
                 pageUI.PageIndex = asset.PageIndex;
                 pageUI.HasUI = asset.HasUI;
 
-                if(pageUI.HasUI)
+                if (pageUI.HasUI)
                 {
                     // اضافه کردن AudioSO ها
                     if (asset.Audios != null && asset.Audios.Count > 0)
@@ -185,9 +187,8 @@ public class BookInit : MonoBehaviour
                             StartCoroutine(DownloadAudio(audioAsset.Path, audioSO));
                         }
                     }
-                    else if (asset.Videos != null)
+                    else if (!string.IsNullOrEmpty(asset.Videos.Path))
                     {
-                        Debug.Log(asset.Videos.Path);
                         VideoSO videoSO = ScriptableObject.CreateInstance<VideoSO>();
                         videoSO.URL = asset.Videos.Path;
                         pageUI.VideoInfo = videoSO;
@@ -207,7 +208,14 @@ public class BookInit : MonoBehaviour
                         {
                             rightPlayButton.gameObject.SetActive(true);
                         }
-                    }                    
+                    }
+                    else if(!string.IsNullOrEmpty(asset.PDF.Path))
+                    {
+                        PDFSO pdfSO = ScriptableObject.CreateInstance<PDFSO>();
+                        pdfSO.URL = asset.PDF.Path;
+                        pageUI.PDF = pdfSO;
+                        mat.SetTexture("_BaseMap", PDFTexture);
+                    }
                 }
                 UISO[asset.PageIndex] = pageUI;
 
@@ -379,6 +387,12 @@ public class AudioAsset
 }
 
 [Serializable]
+public class PDFAsset
+{
+    public string Path;
+}
+
+[Serializable]
 public class VideoAsset
 {
     public string Path;
@@ -394,6 +408,7 @@ public class AssetData
     public bool HasUI;
     public List<AudioAsset> Audios;
     public VideoAsset Videos;
+    public PDFAsset PDF;
 }
 
 [Serializable]

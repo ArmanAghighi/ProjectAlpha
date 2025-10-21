@@ -26,4 +26,5 @@ public class UISO : ScriptableObject
     public bool HasUI;
     public List<AudioSO> AudioInfo = new List<AudioSO>();
     public VideoSO VideoInfo;
+    public PDFSO PDF;
 }
