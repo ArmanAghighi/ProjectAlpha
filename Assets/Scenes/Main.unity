@@ -210,6 +210,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: LogoParent
       objectReference: {fileID: 0}
+    - target: {fileID: 5396451964984857830, guid: b41b2a3b18254e24487d9300276be749, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5396451964984857830, guid: b41b2a3b18254e24487d9300276be749, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 1.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8634386014039002127, guid: b41b2a3b18254e24487d9300276be749, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
