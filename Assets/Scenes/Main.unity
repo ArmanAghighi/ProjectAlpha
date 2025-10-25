@@ -707,6 +707,17 @@ Mesh:
     offset: 0
     size: 0
     path: 
+--- !u!114 &512620858 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2246994249209357048, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+  m_PrefabInstance: {fileID: 1727822913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &568435042
 GameObject:
   m_ObjectHideFlags: 0
@@ -1603,6 +1614,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!114 &1251926231 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5700501370974360946, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+  m_PrefabInstance: {fileID: 1727822913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1460437609
 GameObject:
   m_ObjectHideFlags: 0
@@ -2017,6 +2039,10 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1854454844692620178, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
+      propertyPath: m_MaxZoomFactorTextureQuality
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 7406070905699857498, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2078,7 +2104,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1596007621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2304,6 +2330,34 @@ PrefabInstance:
       propertyPath: mindARImageTrackingManager
       value: 
       objectReference: {fileID: 810950898}
+    - target: {fileID: 1559605599390694776, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: maxScale
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1559605599390694776, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: minScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1559605599390694776, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: zoomSlider
+      value: 
+      objectReference: {fileID: 512620858}
+    - target: {fileID: 1559605599390694776, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: webARCamera
+      value: 
+      objectReference: {fileID: 912982876}
+    - target: {fileID: 1559605599390694776, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: zoomMessage
+      value: 
+      objectReference: {fileID: 1251926231}
+    - target: {fileID: 2358174261263669152, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2358174261263669152, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3992256979275662815, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
       propertyPath: PDF
       value: 
@@ -2312,6 +2366,18 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 912982876}
+    - target: {fileID: 7305651298809923777, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8114602855747147648, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8114602855747147648, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
