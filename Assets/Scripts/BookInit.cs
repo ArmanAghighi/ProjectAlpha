@@ -42,6 +42,14 @@ public class BookInit : MonoBehaviour
     public VideoPlayer[] GetVPlayers() => vPlayers;
     [Header("PDF")]
     public Texture PDFTexture;
+    public GameObject PDF;
+    public Button RightPDFButton;
+    public Button LeftPDFButton;
+    public Sprite OnSprite;
+    public Sprite OffSprite;
+    public bool RightPDFActivated = false;
+    public bool LeftPDFActivated = false;
+
 
     private EndlessBook book;
     private bool isLTR;
@@ -208,13 +216,16 @@ public class BookInit : MonoBehaviour
                         {
                             rightPlayButton.gameObject.SetActive(true);
                         }
+
                     }
-                    else if(!string.IsNullOrEmpty(asset.PDF.Path))
+                    else if (!string.IsNullOrEmpty(asset.PDF.Path))
                     {
                         PDFSO pdfSO = ScriptableObject.CreateInstance<PDFSO>();
                         pdfSO.URL = asset.PDF.Path;
                         pageUI.PDF = pdfSO;
                         mat.SetTexture("_BaseMap", PDFTexture);
+                        PDF.gameObject.SetActive(false);
+
                     }
                 }
                 UISO[asset.PageIndex] = pageUI;
@@ -224,7 +235,33 @@ public class BookInit : MonoBehaviour
                     book.AddPageData();
                 PageData pd = new PageData { material = mat, hasUI = asset.HasUI, UI = pageUI };
                 book.SetPageData(asset.PageIndex, pd);
-            }
+            }            
+                                   rightPlayButton.onClick.AddListener(() =>
+                        {
+                            int currentPage = book.CurrentRightPageNumber;
+                            var players = gameObject.GetComponents<VideoPlayer>();
+
+                            foreach (var p in players)
+                            {
+                                if (UISO[currentPage].VideoInfo != null && p.url == UISO[currentPage].VideoInfo.URL)
+                                {
+                                    if (p.isPlaying)
+                                    {
+                                        p.Pause();
+                                        rightPlayButton.gameObject.GetComponent<Image>().enabled = true;
+                                        rightPlayButton.gameObject.GetComponent<Image>().sprite = PauseSprite;
+                                    }
+                                    else
+                                    {
+                                        p.Play();
+                                        StartCoroutine(ShowAndHidePlayButton(rightPlayButton, 2f));
+                                        rightPlayButton.gameObject.GetComponent<Image>().sprite = PlaySprite;
+                                    }
+                                    break;
+                                }
+                            }
+                        });
+
             leftPlayButton.onClick.AddListener(() =>
             {
                 int currentPage = book.CurrentLeftPageNumber;
@@ -250,31 +287,36 @@ public class BookInit : MonoBehaviour
                     }
                 }
             });
-            rightPlayButton.onClick.AddListener(() =>
+            RightPDFButton.onClick.AddListener(() =>
             {
-                int currentPage = book.CurrentRightPageNumber;
-                var players = gameObject.GetComponents<VideoPlayer>();
-
-                foreach (var p in players)
+                if (!RightPDFActivated)
                 {
-                    if (UISO[currentPage].VideoInfo != null && p.url == UISO[currentPage].VideoInfo.URL)
-                    {
-                        if (p.isPlaying)
-                        {
-                            p.Pause();
-                            rightPlayButton.gameObject.GetComponent<Image>().enabled = true;
-                            rightPlayButton.gameObject.GetComponent<Image>().sprite = PauseSprite;
-                        }
-                        else
-                        {
-                            p.Play();
-                            StartCoroutine(ShowAndHidePlayButton(rightPlayButton, 2f));
-                            rightPlayButton.gameObject.GetComponent<Image>().sprite = PlaySprite;
-                        }
-                        break;
-                    }
+                    RightPDFButton.image.sprite = OnSprite;
+                    PDF.gameObject.SetActive(true);
                 }
+
+                else
+                {
+                    RightPDFButton.image.sprite = OffSprite;
+                    PDF.gameObject.SetActive(false);
+                }
+                RightPDFActivated = !RightPDFActivated;
             });
+            LeftPDFButton.onClick.AddListener(() =>
+            {
+                if (!LeftPDFActivated)
+                {
+                    LeftPDFButton.image.sprite = OnSprite;
+                    PDF.gameObject.SetActive(true);
+                }
+                else
+                {
+                    LeftPDFButton.image.sprite = OffSprite;
+                    PDF.gameObject.SetActive(false);
+                }
+                LeftPDFActivated = !LeftPDFActivated;
+            });
+                                    
         OnDownloadedFinishEvent();
         }
     }

@@ -121,6 +121,8 @@ bool IsPointerOverUI()
 
         bookinit.leftPlayButton.gameObject.SetActive(false);
         bookinit.rightPlayButton.gameObject.SetActive(false);
+        bookinit.RightPDFButton.gameObject.SetActive(false);
+        bookinit.LeftPDFButton.gameObject.SetActive(false);
         foreach (var vp in bookinit.GetVPlayers())
             vp.Pause();
 
@@ -269,6 +271,14 @@ bool IsPointerOverUI()
         if (Book.GetPageData(Book.CurrentRightPageNumber).UI.VideoInfo != null)
         {
             bookinit.rightPlayButton.gameObject.SetActive(true);
+        }
+        if (Book.GetPageData(Book.CurrentLeftPageNumber).UI.PDF != null)
+        {
+            bookinit.RightPDFButton.gameObject.SetActive(true);
+        }        
+        if(Book.GetPageData(Book.CurrentRightPageNumber).UI.PDF != null)
+        {
+            bookinit.LeftPDFButton.gameObject.SetActive(true);
         }
     }
 }
