@@ -55,7 +55,7 @@ public class AudioBehaviour : MonoBehaviour
     {
         if (clip == null)
         {
-            Debug.LogWarning("⚠️ InitializeAudio called with null clip");
+            StartCoroutine(ErrorTextHandler.Instance.SetErrorText("Error Downloading Audio File.Try Restart The App...", 2));
             return;
         }
 
@@ -64,15 +64,13 @@ public class AudioBehaviour : MonoBehaviour
         int totalSeconds = Mathf.FloorToInt(clip.length);
         timePlaceholder.text = $"{totalSeconds / 60:00}:{totalSeconds % 60:00}";
         slider.maxValue = totalSeconds;
-
-        Debug.Log($"🎵 AudioClip set: {clip.name}");
     }
 
     public void PlayAudio()
     {
         if (audioSource == null || audioSO?.AudioClip == null)
         {
-            Debug.LogWarning("⚠️ AudioSource or AudioClip is missing");
+            StartCoroutine(ErrorTextHandler.Instance.SetErrorText("Error Finding Audio File.Try Restart The App...", 2));
             return;
         }
 

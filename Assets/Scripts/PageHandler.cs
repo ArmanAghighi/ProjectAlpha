@@ -119,14 +119,10 @@ bool IsPointerOverUI()
 
         if (Book.isChangingState) return;
 
-        bookinit.leftPlayButton.gameObject.SetActive(false);
-        bookinit.rightPlayButton.gameObject.SetActive(false);
+        bookinit.LeftPlayButton.gameObject.SetActive(false);
+        bookinit.RightPlayButton.gameObject.SetActive(false);
         bookinit.RightPDFButton.gameObject.SetActive(false);
         bookinit.LeftPDFButton.gameObject.SetActive(false);
-        foreach (var vp in bookinit.GetVPlayers())
-            vp.Pause();
-
-
 
         switch (Book.CurrentState)
         {
@@ -266,11 +262,11 @@ bool IsPointerOverUI()
                 
         if (Book.GetPageData(Book.CurrentLeftPageNumber).UI.VideoInfo != null)
         {
-            bookinit.leftPlayButton.gameObject.SetActive(true);
+            bookinit.LeftPlayButton.gameObject.SetActive(true);
         }
         if (Book.GetPageData(Book.CurrentRightPageNumber).UI.VideoInfo != null)
         {
-            bookinit.rightPlayButton.gameObject.SetActive(true);
+            bookinit.RightPlayButton.gameObject.SetActive(true);
         }
         if (Book.GetPageData(Book.CurrentLeftPageNumber).UI.PDF != null)
         {

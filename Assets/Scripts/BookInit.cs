@@ -1,45 +1,39 @@
-using TMPro;
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 using System.Collections;
 using echo17.EndlessBook;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 using UnityEngine.Video;
 using UnityEngine.UI;
+using System.IO;
 
 [RequireComponent(typeof(EndlessBook))]
 public class BookInit : MonoBehaviour
 {
-    public enum PagePicType { jpg, jpeg, png }
-
-    [Header("Server")]
-    [SerializeField] private string mainAddress;
-    [SerializeField] private string imageAddress;
-    [SerializeField] private string audioAddress;
-    [SerializeField] private string videoAddress;
-
     [Header("JSON")]
     [SerializeField] private string jsonAddress = "https://armanitproject.ir/Content/JSON/AssetJson.json";
+    private bool isSavedOnIndexedDataBase = false;
 
     [Header("Fallback & Settings")]
     [SerializeField] private Material fallbackMaterial;
     [SerializeField] private int initialMaxPagesTurning = 1;
-    [Header("Debug")]
-    [SerializeField] private TextMeshProUGUI debug;
-    [Header("Events")]
-    public UnityEvent OnReady;
+    
+
     [Header("Video")]
     [SerializeField] private RenderTexture videoRenderer;
-    public Button leftPlayButton;
-    public Button rightPlayButton;
+    public Button LeftPlayButton;
+    public Button RightPlayButton;
     public Sprite PauseSprite;
     public Sprite PlaySprite;
     private List<VideoPlayer> vidoeList = new List<VideoPlayer>();
-    private bool isPlaying;
-    private VideoPlayer[] vPlayers;
-    public VideoPlayer[] GetVPlayers() => vPlayers;
+    private Image leftButtonImageComponent;
+    private Image rightButtonImageComponent;
+    private Color buttonImageColor;
+    private float buttonImageFadeDuration = 1f;
+    private float buttonImageElapsed = 0f;
+    private int currentPageNumber = -1;
+
     [Header("PDF")]
     public Texture PDFTexture;
     public GameObject PDF;
@@ -47,8 +41,8 @@ public class BookInit : MonoBehaviour
     public Button LeftPDFButton;
     public Sprite OnSprite;
     public Sprite OffSprite;
-    public bool RightPDFActivated = false;
-    public bool LeftPDFActivated = false;
+    private bool RightPDFActivated = false;
+    private bool LeftPDFActivated = false;
 
 
     private EndlessBook book;
@@ -56,12 +50,9 @@ public class BookInit : MonoBehaviour
     private Dictionary<int, UISO> uiScriptableObject = new Dictionary<int, UISO>();
     public Dictionary<int, UISO> UISO => uiScriptableObject;
 
-    public Action<int, int> SetPageIndex;
-
-    private void Awake()
+    private void Initialization()
     {
         book = GetComponent<EndlessBook>();
-        EnsureAtLeastOnePage();
         isLTR = book.textDirection == EndlessBook.TextDirection.LTR ? true : false;
         if (book == null)
         {
@@ -70,223 +61,235 @@ public class BookInit : MonoBehaviour
             return;
         }
 
-        if (fallbackMaterial == null)
-        {
-            fallbackMaterial = book.PageFillerMaterial;
-        }
-
-        imageAddress = CombineUrl(mainAddress, "Content", imageAddress);
-        audioAddress = CombineUrl(mainAddress, "Content", audioAddress);
-        videoAddress = CombineUrl(mainAddress, "Content", videoAddress);
+        if (fallbackMaterial == null) fallbackMaterial = book.PageFillerMaterial;
 
         book.SetMaxPagesTurningCount(initialMaxPagesTurning);
-        
-        StartCoroutine(GetAccessToServer());
-    }
 
-    public static string CombineUrl(params string[] parts)
-    {
-        string url = "";
-        foreach (var part in parts)
+        if (book.LastPageNumber == 0)
         {
-            if (string.IsNullOrEmpty(part)) continue;
-            if (url.EndsWith("/")) url = url.TrimEnd('/');
-            string cleanPart = part.TrimStart('/');
-            url = string.IsNullOrEmpty(url) ? cleanPart : $"{url}/{cleanPart}";
-        }
-        return url;
-    }
-
-    private IEnumerator GetAccessToServer()
-    {
-        if (!string.IsNullOrEmpty(mainAddress))
-        {
-            using (UnityWebRequest r = UnityWebRequest.Get(mainAddress))
-            {
-                yield return r.SendWebRequest();
-                if (r.result != UnityWebRequest.Result.Success)
-                {
-                    Debug.LogWarning($"BookInit: Could not reach mainAddress ({r.error}). Will still try JSON address.");
-                }
-                else
-                    yield return StartCoroutine(LoadAssets());
-            }
+            var pd = new PageData { material = fallbackMaterial ?? book.PageFillerMaterial };
+            book.AddPageData();
+            book.SetPageData(1, pd);
         }
 
+        leftButtonImageComponent = LeftPlayButton.GetComponent<Image>();
+        rightButtonImageComponent = RightPlayButton.GetComponent<Image>();
+
+        StartCoroutine(LoadAssets());
     }
+
+    private void Awake() => Initialization();
 
     private IEnumerator LoadAssets()
     {
-        using (UnityWebRequest request = UnityWebRequest.Get(jsonAddress))
+        AssetList localAssetList = new AssetList();
+        DateTime localAssetModifiedTime = DateTime.MinValue;
+
+        AssetList serverAssetList = new AssetList();
+        DateTime serverAssetModifiedTime = DateTime.MinValue;
+
+        string localJson = null;
+        yield return LoadJsonFromIDBFS("AssetJson.json", (json) => localJson = json);
+
+        yield return GetJsonFromServer();
+
+        if (string.IsNullOrEmpty(localJson)) yield return GetUpdatedDataFromServer();
+        else
         {
-            yield return request.SendWebRequest();
-            if (request.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("JSON load error: " + request.error);
-                yield break;
-            }
+            localAssetList = JsonUtility.FromJson<AssetList>(localJson);
+            DateTime.TryParse(localAssetList.LastModifiedTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out localAssetModifiedTime);
+            if (serverAssetModifiedTime > localAssetModifiedTime)
+                yield return GetUpdatedDataFromServer();
+            //else
+                //yield return SetDownloadedDataFromIDBFS();
+        } 
+                   
+        IEnumerator LoadJsonFromIDBFS(string filename, Action<string> onLoaded)
+        {
+            yield return new WaitForSeconds(0.1f);
 
-            AssetList assetList = JsonUtility.FromJson<AssetList>(request.downloadHandler.text);
-            if (assetList?.Assets == null || assetList.Assets.Count == 0)
-            {
-                Debug.LogWarning("No assets found in JSON.");
-                yield break;
-            }
+            string path = Path.Combine(Application.persistentDataPath, filename);
 
+            if (File.Exists(path))
+            {
+                string json = File.ReadAllText(path);
+                isSavedOnIndexedDataBase = true;
+                onLoaded?.Invoke(json);
+            }
+            else
+            {
+                isSavedOnIndexedDataBase = false;
+                onLoaded?.Invoke(null);
+            }
+        }
+    
+        void SaveJsonOnIDBFSY(AssetList json)
+        {
+            string savePath = Path.Combine(Application.persistentDataPath, "AssetJson.json");
+            try
+            {
+                string jsonToSave = JsonUtility.ToJson(json, true);
+                File.WriteAllText(savePath, jsonToSave);
+                StartCoroutine(ErrorTextHandler.Instance.SetErrorText($"AssetList saved to: {savePath}", 3));
+            }
+            catch
+            {
+                StartCoroutine(ErrorTextHandler.Instance.SetErrorText("❌ Failed to save AssetList", 1));
+            }
+        }
+    
+        IEnumerator GetJsonFromServer()
+        {
+            using (UnityWebRequest request = UnityWebRequest.Get(jsonAddress))
+            {
+                yield return request.SendWebRequest();
+                if (request.result != UnityWebRequest.Result.Success)
+                {
+                    StartCoroutine(ErrorTextHandler.Instance.SetErrorText("No Internet ...", 2));
+                    yield break;
+                }
+
+                serverAssetList = JsonUtility.FromJson<AssetList>(request.downloadHandler.text);
+                DateTime.TryParse(serverAssetList.LastModifiedTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out serverAssetModifiedTime);
+
+                if (serverAssetList?.Assets == null || serverAssetList.Assets.Count == 0)
+                {
+                    StartCoroutine(ErrorTextHandler.Instance.SetErrorText("No assets found in JSON.", 2));
+                    yield break;
+                }
+            }
+        }
+        
+        IEnumerator GetUpdatedDataFromServer()
+        {
             Vector2 textureScale = new Vector2(1.245f, 1f);
-            foreach (var asset in assetList.Assets)
+            foreach (var asset in serverAssetList.Assets)
             {
+                DateTime assetDateTime;
+                DateTime.TryParse(asset.ModifiedTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out assetDateTime);
+                //DateTime downloadedDateTime;
+                //DateTime.TryParse(localAssetList.Assets[asset.PageIndex - 1].ModifiedTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out downloadedDateTime);
+
                 if (asset.PageIndex < 1)
                     continue;
 
                 // ایجاد Texture
-                Texture2D tex = null;
-                using (UnityWebRequest texReq = UnityWebRequestTexture.GetTexture(asset.Path))
+                //if (assetDateTime == downloadedDateTime) continue;
+                //else
                 {
-                    yield return texReq.SendWebRequest();
-                    if (texReq.result == UnityWebRequest.Result.Success)
-                        tex = DownloadHandlerTexture.GetContent(texReq);
-                }
-
-                // ایجاد Material
-
-                Shader sh = Shader.Find("Universal Render Pipeline/Simple Lit") ?? Shader.Find("Standard");
-                Material mat = new Material(sh) { name = $"Page_{asset.PageIndex}" };
-                mat.mainTextureScale = textureScale;
-                if (mat.HasProperty("_BaseMap") && tex != null)
-                    mat.SetTexture("_BaseMap", tex);
-
-                // ایجاد UISO
-                UISO pageUI = ScriptableObject.CreateInstance<UISO>();
-                pageUI.PageTexture = tex;
-                pageUI.PageName = asset.Name;
-                pageUI.Path = asset.Path;
-                pageUI.Type = asset.Type;
-                pageUI.PageIndex = asset.PageIndex;
-                pageUI.HasUI = asset.HasUI;
-
-                if (pageUI.HasUI)
-                {
-                    // اضافه کردن AudioSO ها
-                    if (asset.Audios != null && asset.Audios.Count > 0)
+                    Texture2D tex = null;
+                    using (UnityWebRequest texReq = UnityWebRequestTexture.GetTexture(asset.Path))
                     {
-                        for (int i = 0; i < asset.Audios.Count; i++)
+                        yield return texReq.SendWebRequest();
+                        if (texReq.result == UnityWebRequest.Result.Success)
+                            tex = DownloadHandlerTexture.GetContent(texReq);
+                    }
+
+                    Shader sh = Shader.Find("Universal Render Pipeline/Simple Lit") ?? Shader.Find("Standard");
+                    Material mat = new Material(sh) { name = $"Page_{asset.PageIndex}" };
+                    mat.mainTextureScale = textureScale;
+                    if (mat.HasProperty("_BaseMap") && tex != null)
+                        mat.SetTexture("_BaseMap", tex);
+
+                    // ایجاد UISO
+                    UISO pageUI = ScriptableObject.CreateInstance<UISO>();
+                    pageUI.PageTexture = tex;
+                    pageUI.PageName = asset.Name;
+                    pageUI.Path = asset.Path;
+                    pageUI.Type = asset.Type;
+                    pageUI.PageIndex = asset.PageIndex;
+                    pageUI.HasUI = asset.HasUI;
+
+                    if (pageUI.HasUI)
+                    {
+                        if (asset.Audios != null && asset.Audios.Count > 0)
                         {
-                            var audioAsset = asset.Audios[i];
-                            AudioSO audioSO = ScriptableObject.CreateInstance<AudioSO>();
-                            audioSO.AudioIndex = audioAsset.AudioIndex;
-                            audioSO.Position = audioAsset.GetMediaPosition();
-                            audioSO.Width = audioAsset.Width;
-                            audioSO.Height = audioAsset.Height;
-                            audioSO.PlayOnAwake = audioAsset.PlayOnAwake;
-                            audioSO.Mute = audioAsset.Mute;
-                            audioSO.Volume = audioAsset.Volume;
-
-                            pageUI.AudioInfo.Add(audioSO);
-
-                            int capturedPageIndex = asset.PageIndex;
-                            int capturedAudioIndex = i;
-
-                            audioSO.OnClipReady += (so) =>
+                            for (int i = 0; i < asset.Audios.Count; i++)
                             {
-                                OnAudioClipReady(so, capturedPageIndex, capturedAudioIndex);
-                            };
+                                var audioAsset = asset.Audios[i];
+                                AudioSO audioSO = ScriptableObject.CreateInstance<AudioSO>();
+                                audioSO.AudioIndex = audioAsset.AudioIndex;
+                                audioSO.Position = audioAsset.GetMediaPosition();
 
-                            StartCoroutine(DownloadAudio(audioAsset.Path, audioSO));
-                        }
-                    }
-                    else if (!string.IsNullOrEmpty(asset.Videos.Path))
-                    {
-                        VideoSO videoSO = ScriptableObject.CreateInstance<VideoSO>();
-                        videoSO.URL = asset.Videos.Path;
-                        pageUI.VideoInfo = videoSO;
-                        RenderTexture newVideoRenderer = new RenderTexture(videoRenderer);
-                        mat.SetTexture("_BaseMap", newVideoRenderer);
-                        VideoPlayer videoPlayer = gameObject.AddComponent<VideoPlayer>();
-                        videoPlayer.targetTexture = newVideoRenderer;
-                        videoPlayer.url = videoSO.URL;
-                        videoPlayer.playOnAwake = false;
-                        videoPlayer.Pause();
-                        vidoeList.Add(videoPlayer);
-                        if (book.GetPageData(book.CurrentLeftPageNumber).UI.VideoInfo != null)
-                        {
-                            leftPlayButton.gameObject.SetActive(true);
-                        }
-                        if (book.GetPageData(book.CurrentRightPageNumber).UI.VideoInfo != null)
-                        {
-                            rightPlayButton.gameObject.SetActive(true);
-                        }
+                                pageUI.AudioInfo.Add(audioSO);
 
-                    }
-                    else if (!string.IsNullOrEmpty(asset.PDF.Path))
-                    {
-                        PDFSO pdfSO = ScriptableObject.CreateInstance<PDFSO>();
-                        pdfSO.URL = asset.PDF.Path;
-                        pageUI.PDF = pdfSO;
-                        mat.SetTexture("_BaseMap", PDFTexture);
-                        PDF.gameObject.SetActive(false);
+                                int capturedPageIndex = asset.PageIndex;
+                                int capturedAudioIndex = i;
 
-                    }
-                }
-                UISO[asset.PageIndex] = pageUI;
-
-                // اطمینان از داشتن صفحات کافی
-                while (book.LastPageNumber < asset.PageIndex)
-                    book.AddPageData();
-                PageData pd = new PageData { material = mat, hasUI = asset.HasUI, UI = pageUI };
-                book.SetPageData(asset.PageIndex, pd);
-            }            
-                                   rightPlayButton.onClick.AddListener(() =>
-                        {
-                            int currentPage = book.CurrentRightPageNumber;
-                            var players = gameObject.GetComponents<VideoPlayer>();
-
-                            foreach (var p in players)
-                            {
-                                if (UISO[currentPage].VideoInfo != null && p.url == UISO[currentPage].VideoInfo.URL)
-                                {
-                                    if (p.isPlaying)
-                                    {
-                                        p.Pause();
-                                        rightPlayButton.gameObject.GetComponent<Image>().enabled = true;
-                                        rightPlayButton.gameObject.GetComponent<Image>().sprite = PauseSprite;
-                                    }
-                                    else
-                                    {
-                                        p.Play();
-                                        StartCoroutine(ShowAndHidePlayButton(rightPlayButton, 2f));
-                                        rightPlayButton.gameObject.GetComponent<Image>().sprite = PlaySprite;
-                                    }
-                                    break;
-                                }
+                                StartCoroutine(DownloadAudio(audioAsset.Path, audioSO));
                             }
-                        });
+                        }
+                        else if (!string.IsNullOrEmpty(asset.Videos.Path))
+                        {
+                            VideoSO videoSO = ScriptableObject.CreateInstance<VideoSO>();
+                            videoSO.URL = asset.Videos.Path;
+                            pageUI.VideoInfo = videoSO;
+                            RenderTexture newVideoRenderer = new RenderTexture(videoRenderer);
+                            mat.SetTexture("_BaseMap", newVideoRenderer);
+                            VideoPlayer videoPlayer = gameObject.AddComponent<VideoPlayer>();
+                            videoPlayer.targetTexture = newVideoRenderer;
+                            videoPlayer.url = videoSO.URL;
+                            videoPlayer.playOnAwake = false;
+                            videoPlayer.Pause();
+                            vidoeList.Add(videoPlayer);
+                            if (book.GetPageData(book.CurrentLeftPageNumber).UI.VideoInfo != null)
+                            {
+                                LeftPlayButton.gameObject.SetActive(true);
+                            }
+                            if (book.GetPageData(book.CurrentRightPageNumber).UI.VideoInfo != null)
+                            {
+                                RightPlayButton.gameObject.SetActive(true);
+                            }
 
-            leftPlayButton.onClick.AddListener(() =>
+                        }
+                        else if (!string.IsNullOrEmpty(asset.PDF.Path))
+                        {
+                            PDFSO pdfSO = ScriptableObject.CreateInstance<PDFSO>();
+                            pdfSO.URL = asset.PDF.Path;
+                            pageUI.PDF = pdfSO;
+                            mat.SetTexture("_BaseMap", PDFTexture);
+                            PDF.gameObject.SetActive(false);
+
+                        }
+                    }
+                    UISO[asset.PageIndex] = pageUI;
+
+                    // اطمینان از داشتن صفحات کافی
+                    while (book.LastPageNumber < asset.PageIndex)
+                        book.AddPageData();
+                    PageData pd = new PageData { material = mat, hasUI = asset.HasUI, UI = pageUI };
+                    book.SetPageData(asset.PageIndex, pd);
+                    
+                    Debug.LogWarning(asset.Name); //====================This must log the name of updated pages
+                }
+            }
+
+            RightPlayButton.onClick.AddListener(() => SetListenerToVideoPlayerButton(true));
+
+            LeftPlayButton.onClick.AddListener(() => SetListenerToVideoPlayerButton(false));
+
+            void SetListenerToVideoPlayerButton(bool isOnRightPage)
             {
-                int currentPage = book.CurrentLeftPageNumber;
-                var players = gameObject.GetComponents<VideoPlayer>();
-
-                foreach (var p in players)
+                currentPageNumber = isOnRightPage ? book.CurrentRightPageNumber : book.CurrentLeftPageNumber;
+                foreach (var p in vidoeList)
                 {
-                    if (UISO[currentPage].VideoInfo != null && p.url == UISO[currentPage].VideoInfo.URL)
+                    if (UISO[currentPageNumber].VideoInfo != null && p.url == UISO[currentPageNumber].VideoInfo.URL)
                     {
                         if (p.isPlaying)
                         {
                             p.Pause();
-                            leftPlayButton.gameObject.GetComponent<Image>().enabled = true;
-                            leftPlayButton.gameObject.GetComponent<Image>().sprite = PauseSprite;
+                            StartCoroutine(ShowAndHidePlayButton(isOnRightPage, PauseSprite, int.MaxValue));
                         }
                         else
                         {
                             p.Play();
-                            leftPlayButton.gameObject.GetComponent<Image>().sprite = PlaySprite;
-                            StartCoroutine(ShowAndHidePlayButton(leftPlayButton, 2f));
+                            StartCoroutine(ShowAndHidePlayButton(isOnRightPage, PlaySprite, 2f));
                         }
                         break;
                     }
                 }
-            });
+            }
+
             RightPDFButton.onClick.AddListener(() =>
             {
                 if (!RightPDFActivated)
@@ -294,7 +297,6 @@ public class BookInit : MonoBehaviour
                     RightPDFButton.image.sprite = OnSprite;
                     PDF.gameObject.SetActive(true);
                 }
-
                 else
                 {
                     RightPDFButton.image.sprite = OffSprite;
@@ -316,51 +318,59 @@ public class BookInit : MonoBehaviour
                 }
                 LeftPDFActivated = !LeftPDFActivated;
             });
-                                    
-        OnDownloadedFinishEvent();
+
+            SaveJsonOnIDBFSY(serverAssetList);
+            OnDownloadedFinishEvent();
         }
-    }
-
-    private void OnAudioClipReady(AudioSO so, int pageIndex, int audioIndex)
-    {
-
-        if (UISO.TryGetValue(pageIndex, out UISO uiso) && audioIndex < uiso.AudioInfo.Count)
-        {
-            uiso.AudioInfo[audioIndex] = so;
-
-            // اطلاع به AudioBehaviour ها
-            SetPageIndex?.Invoke(pageIndex, audioIndex);
-        }
+    
+        // IEnumerator SetDownloadedDataFromIDBFS()
+        // {
+            
+        // }
     }
     
-    private void EnsureAtLeastOnePage()
-    {
-        if (book.LastPageNumber == 0)
-        {
-            var pd = new PageData { material = fallbackMaterial ?? book.PageFillerMaterial };
-            book.AddPageData();
-            book.SetPageData(1, pd);
-            Debug.Log("BookInit: Added fallback page to ensure at least one PageData exists.");
-        }
-    }
 
-    private IEnumerator PostProcessAfterSetPageData()
-    {
-        yield return null;
-        yield return new WaitForEndOfFrame();
+    
 
-        Debug.Log("BookInit: MaxPagesTurningCount set to " + book.LastPageNumber);
-        for (int i = 1; i <= book.LastPageNumber; i++)
+    private IEnumerator ShowAndHidePlayButton(bool isOnRightPage, Sprite sprite, float duration)
+    {
+        buttonImageElapsed = 0f;
+        switch(isOnRightPage)
         {
-            PageData pd = book.GetPageData(i);
-            if (pd.material == null)
-            {
-                pd.material = fallbackMaterial ?? book.PageFillerMaterial;
-                book.SetPageData(i, pd);
-                Debug.LogWarning($"BookInit: Page {i} had no material — assigned fallback.");
-            }
+            case true:
+                rightButtonImageComponent.sprite = sprite;
+                buttonImageColor = rightButtonImageComponent.color;
+                buttonImageColor.a = 0.65f;
+                rightButtonImageComponent.color = buttonImageColor;
+                yield return new WaitForSeconds(duration);
+                while (buttonImageElapsed < buttonImageFadeDuration)
+                {
+                    buttonImageElapsed += Time.deltaTime;
+                    buttonImageColor.a = Mathf.Lerp(0.65f, 0f, buttonImageElapsed / buttonImageFadeDuration);
+                    rightButtonImageComponent.color = buttonImageColor;
+                    yield return null;
+                }
+                buttonImageColor.a = 0f;
+                rightButtonImageComponent.color = buttonImageColor;
+                break;
+
+            case false:
+                leftButtonImageComponent.sprite = sprite;
+                buttonImageColor = leftButtonImageComponent.color;
+                buttonImageColor.a = 0.65f;
+                leftButtonImageComponent.color = buttonImageColor;
+                yield return new WaitForSeconds(duration);
+                while (buttonImageElapsed < buttonImageFadeDuration)
+                {
+                    buttonImageElapsed += Time.deltaTime;
+                    buttonImageColor.a = Mathf.Lerp(0.65f, 0f, buttonImageElapsed / buttonImageFadeDuration);
+                    leftButtonImageComponent.color = buttonImageColor;
+                    yield return null;
+                }
+                buttonImageColor.a = 0f;
+                leftButtonImageComponent.color = buttonImageColor;
+                break;
         }
-        OnReady?.Invoke();
     }
 
     public void OnDownloadedFinishEvent()
@@ -375,8 +385,6 @@ public class BookInit : MonoBehaviour
             book.SetPageNumber(1);
             book.SetState(EndlessBook.StateEnum.ClosedFront, 0f);
         }
-        vPlayers = gameObject.GetComponents<VideoPlayer>();
-        Debug.Log("Book is Ready!");
     }
 
 
@@ -394,32 +402,15 @@ public class BookInit : MonoBehaviour
                 Debug.LogError("Audio download failed: " + request.error);
         }
     }
-    private IEnumerator ShowAndHidePlayButton(Button button, float duration)
-    {
-        isPlaying = !isPlaying;
-        if (button == null) yield break;
-        button.gameObject.GetComponent<Button>().enabled = true;
-        button.gameObject.GetComponent<Image>().enabled = true;
-        yield return new WaitForSeconds(duration);
-        button.gameObject.GetComponent<Image>().enabled = false;
-
-    }
 }
 
 
 [Serializable]
 public class AudioAsset
 {
-    public string Name;
     public int AudioIndex;
     public string Path;
-    public string Type;
     public string Position;
-    public float Width;
-    public float Height;
-    public bool PlayOnAwake;
-    public bool Mute;
-    public float Volume;
     public MediaPosition GetMediaPosition()
     {
         if (Enum.TryParse<MediaPosition>(Position, out var pos))
@@ -443,6 +434,7 @@ public class VideoAsset
 [Serializable]
 public class AssetData
 {
+    public string ModifiedTime;
     public string Name;
     public string Path;
     public string Type;
@@ -456,5 +448,6 @@ public class AssetData
 [Serializable]
 public class AssetList
 {
+    public string LastModifiedTime;
     public List<AssetData> Assets;
 }
