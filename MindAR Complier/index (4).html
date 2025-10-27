@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mind Builder</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/dropzone.min.css" />
+<style>
+  body {
+    font-family: sans-serif;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fafafa;
+  }
+
+  .container {
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  #my-dropzone {
+    border: 2px dashed #4caf50;
+    background: #f0fdf4;
+    border-radius: 10px;
+    padding: 30px;
+  }
+
+  #progress-bar {
+    width: 100%;
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 20px;
+    margin-top: 20px;
+  }
+
+  #progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4caf50, #81c784);
+    transition: width 0.3s;
+  }
+
+  #progress {
+    margin-top: 15px;
+    text-align: left;
+    background: #f9f9f9;
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h2>Mind JSON Dropzone</h2>
+  <form action="#" class="dropzone" id="my-dropzone"></form>
+
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+  <pre id="progress"></pre>
+</div>
+
+<script type="module">
+import { Compiler } from "./mindar-image.prod.js";
+
+Dropzone.autoDiscover = false;
+const compiler = new Compiler();
+const myDropzone = new Dropzone("#my-dropzone", { url: "#", autoProcessQueue: false });
+
+function log(msg) {
+  console.log(msg);
+  const pre = document.getElementById("progress");
+  pre.textContent += msg + "\n";
+  pre.scrollTop = pre.scrollHeight;
+}
+
+function setProgress(value) {
+  const fill = document.getElementById("progress-fill");
+  fill.style.width = value + "%";
+}
+
+async function addImagesFromJson(jsonUrl) {
+  try {
+    const res = await fetch(jsonUrl);
+    if (!res.ok) return;
+
+    const data = await res.json();
+    const loadedFiles = [];
+
+    for (const item of data.items) {
+      if (!item.isActive) continue;
+
+      try {
+        const imgResp = await fetch(item.IPPath);
+        if (!imgResp.ok) continue;
+
+        const blob = await imgResp.blob();
+        const file = new File([blob], item.Name, { type: blob.type });
+        loadedFiles.push(file);
+
+        myDropzone.addFile(file);
+        myDropzone.createThumbnailFromUrl(file, item.IPPath);
+
+      } catch (err) {
+        log(`Error fetching image ${item.Name}: ${err}`);
+      }
+    }
+
+    if (loadedFiles.length === 0) return;
+    await compileFiles(loadedFiles);
+
+  } catch (err) {
+    log("Error loading images from JSON: " + err);
+  }
+}
+
+const loadImage = (file) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(`Failed to load image object for ${file.name}`);
+    img.src = URL.createObjectURL(file);
+  });
+};
+
+const compileFiles = async (files) => {
+  try {
+    const images = [];
+    for (let f of files) {
+      images.push(await loadImage(f));
+    }
+
+    await compiler.compileImageTargets(images, (p) => {
+      setProgress(p);
+    });
+
+    const exportedBuffer = await compiler.exportData();
+    log("✅ Compilation finished. Exporting targets.mind");
+
+    const blob = new Blob([exportedBuffer]);
+    const mindFile = new File([exportedBuffer], "targets.mind", { type: "application/octet-stream" });
+
+    // دانلود خودکار
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "targets.mind";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    log("💾 targets.mind downloaded.");
+
+    // 🚀 آپلود با نمایش پیشرفت
+    await uploadWithProgress(mindFile);
+
+    // پاک کردن Dropzone
+    myDropzone.removeAllFiles();
+    log("🧹 Dropzone cleared.");
+    setProgress(0);
+
+  } catch (err) {
+    log("❌ Compilation error: " + err);
+  }
+};
+
+async function uploadWithProgress(file) {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+    formData.append("mindfile", file);
+
+    xhr.open("POST", "https://armanitproject.ir/upload_mind.php", true);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = ((event.loaded / event.total) * 100).toFixed(2);
+        setProgress(percent);
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        setProgress(100);
+        log("✅ Upload complete!");
+        resolve();
+      } else {
+        log("❌ Upload failed: " + xhr.status);
+        reject();
+      }
+    };
+
+    xhr.onerror = () => {
+      log("❌ Upload error!");
+      reject();
+    };
+
+    xhr.send(formData);
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  addImagesFromJson("https://armanitproject.ir/Content/JSON/TargetsJson.json");
+});
+</script>
+</body>
+</html>
