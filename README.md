@@ -67,10 +67,6 @@ public_html/
 │
 └── (optional additional files)
 
-yaml
-Copy code
-
----
 
 ## ⚠️ Important Notes
 
@@ -86,8 +82,6 @@ It is automatically generated and placed in:
 
 /Content/Mind/targets.mind
 
-yaml
-Copy code
 
 This file is used by the WebAR runtime (`MindAR`) and the Unity PWA client to load the correct AR tracking targets.
 
@@ -121,5 +115,5 @@ This file is used by the WebAR runtime (`MindAR`) and the Unity PWA client to lo
 
 ---
 
-👨‍💻 *Maintained by [Your Name or Team Name]*  
+👨‍💻 *Maintained by Arman Aghighi*  
 🗓️ *Last Updated: October 2025*
