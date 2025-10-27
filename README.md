@@ -24,24 +24,40 @@ This includes handling `.mind` file logic, Unity scene operations, and PWA inter
 For the project to run correctly, your **server root directory** **must strictly follow** the structure below:
 
 public_html/
-│
+
 ├── API/
+
 │ ├── deleteFile.php
+
 │ ├── ReadItems.php
+
 │ ├── uploadFile.php
-│ └── uploadJson.php
-│
+
+│ ├── uploadJson.php
+
+
 ├── MindAR/
+
 │ ├── controller-i-djYoaY.js
+
 │ ├── controller-sLTuLJIQ.js
+
 │ ├── index.html
+
 │ ├── mindar-face-aframe.prod.js
+
 │ ├── mindar-face-three.prod.js
+
 │ ├── mindar-face.prod.js
+
 │ ├── mindar-image-aframe.prod.js
+
 │ ├── mindar-image-three.prod.js
+
 │ ├── mindar-image.prod.js
+
 │ └── ui-2_N98-vS.js
+
 │
 ├── Content/
 │ ├── Admin/
