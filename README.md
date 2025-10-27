@@ -86,12 +86,11 @@ public_html/
 
 │ └── Videos/
 
-└── (optional additional files)
  
 
 ## ⚠️ Important Notes
 
-- **Do not change the folder structure** without updating the corresponding **ScriptableObject paths** in the Unity project.
+- **Do not change the folder structure** without updating the corresponding **ScriptableObject paths & varialbes** in the Unity project.
 - Any modification to directory names or structure **will cause the app to malfunction** or fail to locate critical assets (JSON, Targets, etc.).
 - Make sure PHP scripts (`uploadFile.php`, `deleteFile.php`, etc.) have proper read/write permissions for `/Content` subdirectories.
 
