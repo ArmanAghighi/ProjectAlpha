@@ -80,7 +80,7 @@ public class BookInit : MonoBehaviour
         OnDownloadedFinishEvent();
     }
 
-    private void Awake() => _= Initialization();
+    private void Awake() => _ = Initialization();
 
     private IEnumerator LoadAssets()
     {
@@ -102,8 +102,9 @@ public class BookInit : MonoBehaviour
             DateTime.TryParse(localAssetList.LastModifiedTime, null, System.Globalization.DateTimeStyles.RoundtripKind, out localAssetModifiedTime);
             if (serverAssetModifiedTime > localAssetModifiedTime)
                 yield return GetUpdatedDataFromServer();
-            //else
+            else
                 //yield return SetDownloadedDataFromIDBFS();
+                yield return GetUpdatedDataFromServer();
         }
 
 
@@ -123,7 +124,7 @@ public class BookInit : MonoBehaviour
                 onLoaded?.Invoke(null);
             }
         }
-    
+
         void SaveJsonOnIDBFSY(AssetList json)
         {
             string savePath = Path.Combine(Application.persistentDataPath, "AssetJson.json");
@@ -138,7 +139,7 @@ public class BookInit : MonoBehaviour
                 StartCoroutine(ErrorTextHandler.Instance.SetErrorText("❌ Failed to save AssetList", 1));
             }
         }
-    
+
         IEnumerator GetJsonFromServer()
         {
             using (UnityWebRequest request = UnityWebRequest.Get(jsonAddress))
@@ -160,7 +161,7 @@ public class BookInit : MonoBehaviour
                 }
             }
         }
-        
+
         IEnumerator GetUpdatedDataFromServer()
         {
             Vector2 textureScale = new Vector2(1.245f, 1f);
@@ -321,18 +322,18 @@ public class BookInit : MonoBehaviour
             SaveJsonOnIDBFSY(serverAssetList);
             OnDownloadedFinishEvent();
         }
-    
+
         // IEnumerator SetDownloadedDataFromIDBFS()
         // {
-            
+
         // }
     }
-    
+
 
     private IEnumerator ShowAndHidePlayButton(bool isOnRightPage, Sprite sprite, float duration)
     {
         buttonImageElapsed = 0f;
-        switch(isOnRightPage)
+        switch (isOnRightPage)
         {
             case true:
                 rightButtonImageComponent.sprite = sprite;
@@ -396,6 +397,16 @@ public class BookInit : MonoBehaviour
             }
             else
                 Debug.LogError("Audio download failed: " + request.error);
+        }
+    }
+    public void DeActiveAllMediaOnPageTurn()
+    {
+        foreach (var p in vidoeList)
+        {
+            if (p.isPlaying)
+            {
+                p.Pause();
+            }
         }
     }
 }

@@ -118,7 +118,7 @@ bool IsPointerOverUI()
         var direction = normalizedTime > 0.5f ? Page.TurnDirectionEnum.TurnForward : Page.TurnDirectionEnum.TurnBackward;
 
         if (Book.isChangingState) return;
-
+        bookinit.DeActiveAllMediaOnPageTurn();
         bookinit.LeftPlayButton.gameObject.SetActive(false);
         bookinit.RightPlayButton.gameObject.SetActive(false);
         bookinit.RightPDFButton.gameObject.SetActive(false);
