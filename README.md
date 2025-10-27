@@ -56,31 +56,36 @@ public_html/
 
 │ ├── mindar-image.prod.js
 
-│ └── ui-2_N98-vS.js
+│ ├── ui-2_N98-vS.js
 
-│
 ├── Content/
+
 │ ├── Admin/
+
 │ │ └── Admin-Info.json
-│ │
+
 │ ├── Assets/
+
 │ │ └── Pages/ ← must be named automatically (e.g. Page_00, Page_01, ...)
-│ │
+
 │ ├── Audios/ ← audio files directory
-│ │
+
 │ ├── Images/ ← target image files
-│ │
+
 │ ├── JSON/
+
 │ │ ├── AssetJson.json
+
 │ │ └── TargetsJson.json
-│ │
+
 │ ├── Mind/
+
 │ │ └── targets.mind
-│ │
+
 │ ├── PDF/
-│ │
+
 │ └── Videos/
-│
+
 └── (optional additional files)
  
 
