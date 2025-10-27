@@ -2244,21 +2244,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: PDFParent
       objectReference: {fileID: 0}
-    - target: {fileID: 1854454844662719032, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
-      propertyPath: m_AnchorMax.x
+    - target: {fileID: 1354015037124762706, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1854454844662719032, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1854454844662719032, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1854454844662724592, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1854454844662724592, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1854454844692620178, guid: 91bdf189e420bc14c80122883d84d62a, type: 3}
       propertyPath: m_MaxZoomFactorTextureQuality
@@ -2824,13 +2828,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f7652166f7ef954e971013529a7d914, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  infoText: {fileID: 586052253}
-  updateInterval: 1
-  fpsAccumulator: 0
-  fpsFrames: 0
-  fpsTimeLeft: 0
-  currentFPS: 0
-  browserInfoJson: 
 --- !u!114 &2050923247 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2963853526491159221, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
