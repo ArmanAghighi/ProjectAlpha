@@ -1,5 +1,6 @@
 This AR project uses WebAR plus an onServer personalized API compiler to create a .mind file to be used and run as PWA webGL unity project.
 It has two side:
+
 1.Admin Core which handles server side file control (Add , Edit and Delete) files and targets.
 
 2.AR Core which handles the core project it self.
