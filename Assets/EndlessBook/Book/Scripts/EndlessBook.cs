@@ -29,8 +29,6 @@
         }
 
         public TextDirection textDirection;
-        // public Canvas leftPageCanvas;
-        // public Canvas rightPageCanvas;
         [Serializable]
         public class MaterialMapping
         {

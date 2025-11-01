@@ -2507,6 +2507,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BookParent
       objectReference: {fileID: 0}
+    - target: {fileID: 963243244426629379, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
+    - target: {fileID: 963243244426629379, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
     - target: {fileID: 1387141612695987349, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2559,26 +2567,18 @@ PrefabInstance:
       propertyPath: PDF
       value: 
       objectReference: {fileID: 694196957}
-    - target: {fileID: 3992256979275662815, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: LeftPlayButton
-      value: 
-      objectReference: {fileID: 1821453107}
-    - target: {fileID: 3992256979275662815, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: RightPlayButton
-      value: 
-      objectReference: {fileID: 2050923247}
-    - target: {fileID: 5249890009769300894, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: m_Color.a
-      value: 0.64705884
-      objectReference: {fileID: 0}
     - target: {fileID: 6000853081365438174, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 912982876}
-    - target: {fileID: 7539037319850878040, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: m_Color.a
-      value: 0.64705884
-      objectReference: {fileID: 0}
+    - target: {fileID: 8826595777870893946, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: 'm_Materials.Array.data[2]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
+    - target: {fileID: 8826595777870893946, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
+      propertyPath: 'm_Materials.Array.data[3]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2725,17 +2725,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1786253699}
   m_CullTransparentMesh: 1
---- !u!114 &1821453107 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5545473438747583301, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-  m_PrefabInstance: {fileID: 1727822913}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &2036784472
 GameObject:
   m_ObjectHideFlags: 0
@@ -2826,17 +2815,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7f7652166f7ef954e971013529a7d914, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &2050923247 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 2963853526491159221, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-  m_PrefabInstance: {fileID: 1727822913}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807

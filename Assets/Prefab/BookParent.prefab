@@ -298,7 +298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.50980395}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.64705884}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1287,8 +1287,8 @@ MeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 13d8a7cc0299e7044b3f718384d32c04, type: 2}
   - {fileID: 2100000, guid: f4c4998190025e74c9bdb4959ac0e559, type: 2}
-  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
-  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
+  - {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
+  - {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
   - {fileID: 2100000, guid: bdb38526121b86447b50668e29efe201, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -2932,8 +2932,8 @@ SkinnedMeshRenderer:
   m_Materials:
   - {fileID: 2100000, guid: 13d8a7cc0299e7044b3f718384d32c04, type: 2}
   - {fileID: 2100000, guid: f4c4998190025e74c9bdb4959ac0e559, type: 2}
-  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
-  - {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
+  - {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
+  - {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
   - {fileID: 2100000, guid: bdb38526121b86447b50668e29efe201, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
@@ -3256,32 +3256,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b534fdbd389e82b459be94aaf06b2087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainAddress: https://armanitproject.ir
-  imageAddress: /Assets
-  audioAddress: /Audios
-  videoAddress: /Videos
   jsonAddress: https://armanitproject.ir/Content/JSON/AssetJson.json
   fallbackMaterial: {fileID: 2100000, guid: 8ebe413c9c5e946d88c1b2614112a4c3, type: 2}
   initialMaxPagesTurning: 1
-  debug: {fileID: 5700501370974360946}
-  OnReady:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 3992256979275662815}
-        m_TargetAssemblyTypeName: BookInit, Assembly-CSharp
-        m_MethodName: OnDownloadedFinishEvent
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
   videoRenderer: {fileID: 8400000, guid: 090322cdf7a5fe34984d15776039356b, type: 2}
-  leftPlayButton: {fileID: 5545473438747583301}
-  rightPlayButton: {fileID: 2963853526491159221}
+  LeftPlayButton: {fileID: 5545473438747583301}
+  RightPlayButton: {fileID: 2963853526491159221}
   PauseSprite: {fileID: -773033819, guid: 8259ffb64c00343498eb14fc8cf25a9d, type: 3}
   PlaySprite: {fileID: 1368709936, guid: 8259ffb64c00343498eb14fc8cf25a9d, type: 3}
   PDFTexture: {fileID: 8400000, guid: 91de866e42baa984393979a7b1ce79d3, type: 2}
@@ -4016,7 +3996,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.50980395}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.64705884}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
