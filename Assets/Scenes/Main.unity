@@ -2507,14 +2507,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BookParent
       objectReference: {fileID: 0}
-    - target: {fileID: 963243244426629379, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: 'm_Materials.Array.data[2]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
-    - target: {fileID: 963243244426629379, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: 'm_Materials.Array.data[3]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
     - target: {fileID: 1387141612695987349, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2571,14 +2563,6 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 912982876}
-    - target: {fileID: 8826595777870893946, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: 'm_Materials.Array.data[2]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
-    - target: {fileID: 8826595777870893946, guid: cce912958059431459cad29f0fc1b7eb, type: 3}
-      propertyPath: 'm_Materials.Array.data[3]'
-      value: 
-      objectReference: {fileID: 2100000, guid: 73e4def15202040be9094b4fa31cc810, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
